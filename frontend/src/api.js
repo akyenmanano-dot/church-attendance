@@ -1,4 +1,6 @@
-const BASE = '/api';
+// In local development, Vite's proxy forwards /api to localhost:4000 (see vite.config.js).
+// In production, set VITE_API_URL to your deployed backend's URL (e.g. https://your-backend.onrender.com/api).
+const BASE = import.meta.env.VITE_API_URL || '/api';
 
 function authHeaders() {
   const token = localStorage.getItem('token');
