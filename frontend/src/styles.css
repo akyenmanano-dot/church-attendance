@@ -1,0 +1,325 @@
+:root {
+  --ink: #211D17;
+  --ink-soft: #4A4438;
+  --paper: #EFE7D8;
+  --paper-dim: #E2D6BC;
+  --paper-line: #C9BB9C;
+  --brass: #9C6B2E;
+  --brass-dark: #7A5323;
+  --burgundy: #7A2E2E;
+  --sage: #57684A;
+  --sage-dim: #E3E8D9;
+  --burgundy-dim: #F1DFDD;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  min-height: 100vh;
+  background: var(--ink);
+}
+
+/* ---------- Header / tabs (bulletin folder tabs) ---------- */
+
+.app-header {
+  padding: 2.5rem 2rem 0;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.app-title {
+  font-family: var(--font-display);
+  color: var(--paper);
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.15rem;
+}
+
+.app-subtitle {
+  color: var(--paper-dim);
+  font-size: 0.9rem;
+  margin: 0 0 1.75rem;
+  opacity: 0.7;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tab {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--paper-dim);
+  background: transparent;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  border-radius: 10px 10px 0 0;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.tab:hover { opacity: 0.85; }
+
+.tab.active {
+  background: var(--paper);
+  color: var(--ink);
+  opacity: 1;
+}
+
+/* ---------- Main ledger surface ---------- */
+
+.ledger {
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--paper);
+  border-radius: 12px 12px 4px 4px;
+  padding: 2rem;
+  min-height: 60vh;
+}
+
+.section-heading {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin: 0 0 0.25rem;
+  color: var(--ink);
+}
+
+.section-desc {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  margin: 0 0 1.5rem;
+}
+
+/* ---------- Service picker ---------- */
+
+.service-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.service-picker select, .field input, .field select {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--paper-line);
+  background: #fff;
+  border-radius: 6px;
+  color: var(--ink);
+}
+
+.btn {
+  font-family: var(--font-body);
+  font-size: 0.87rem;
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--brass);
+  background: var(--brass);
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn:hover { background: var(--brass-dark); }
+
+.btn.ghost {
+  background: transparent;
+  color: var(--brass-dark);
+}
+.btn.ghost:hover { background: var(--paper-dim); }
+
+.btn.subtle {
+  background: transparent;
+  border-color: var(--paper-line);
+  color: var(--ink-soft);
+}
+
+/* ---------- Roll-call ledger rows ---------- */
+
+.roll {
+  border-top: 1px solid var(--paper-line);
+}
+
+.roll-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 0.25rem;
+  border-bottom: 1px solid var(--paper-line);
+}
+
+.roll-row .who {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.roll-name {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.roll-dept {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.mark-btn {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid var(--paper-line);
+  background: #fff;
+  color: var(--ink-soft);
+  min-width: 96px;
+}
+
+.mark-btn.present {
+  background: var(--sage-dim);
+  border-color: var(--sage);
+  color: var(--sage);
+}
+
+.roll-total {
+  margin-top: 1rem;
+  text-align: right;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.roll-total b { color: var(--ink); font-family: var(--font-display); font-size: 1.1rem; }
+
+/* ---------- Dashboard ---------- */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--paper-line);
+  border-radius: 8px;
+  padding: 1.1rem 1.2rem;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin: 0 0 0.35rem;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  color: var(--ink);
+  margin: 0;
+}
+
+.chart-card {
+  background: #fff;
+  border: 1px solid var(--paper-line);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.chart-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  margin: 0 0 1rem;
+}
+
+/* ---------- Flags ---------- */
+
+.flag-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--burgundy-dim);
+  border: 1px solid #E0BDBD;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.flag-name { font-weight: 600; color: var(--burgundy); }
+.flag-reason { font-size: 0.82rem; color: var(--ink-soft); margin-top: 0.15rem; }
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--ink-soft);
+}
+
+.empty-state .glyph {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--paper-line);
+  margin-bottom: 0.5rem;
+}
+
+/* ---------- Member form ---------- */
+
+.member-form {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.member-list {
+  border-top: 1px solid var(--paper-line);
+}
+
+.member-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.7rem 0.25rem;
+  border-bottom: 1px solid var(--paper-line);
+  font-size: 0.9rem;
+}
+
+.member-row .m-dept {
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+
+.error-banner {
+  background: var(--burgundy-dim);
+  color: var(--burgundy);
+  border: 1px solid #E0BDBD;
+  border-radius: 6px;
+  padding: 0.7rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 700px) {
+  .stat-grid { grid-template-columns: 1fr; }
+  .tabs { flex-wrap: wrap; }
+}
