@@ -51,6 +51,12 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(member),
     }).then(handle),
+  lookupMyAttendance: (first_name, last_name, phone) =>
+    fetch(`${BASE}/members/my-attendance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ first_name, last_name, phone }),
+    }).then(handle),
   updateMember: (id, member) =>
     fetch(`${BASE}/members/${id}`, {
       method: 'PUT',
@@ -94,4 +100,17 @@ export const api = {
     fetch(`${BASE}/dashboard/flags/${id}/resolve`, { method: 'POST', headers: authHeaders() }).then(handle),
   runFlagCheck: () =>
     fetch(`${BASE}/run-flag-check`, { method: 'POST', headers: authHeaders() }).then(handle),
+
+  // first-timers
+  getFirstTimers: () => fetch(`${BASE}/first-timers`, { headers: authHeaders() }).then(handle),
+  addFirstTimer: (data) =>
+    fetch(`${BASE}/first-timers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(data),
+    }).then(handle),
+  resolveFirstTimer: (id) =>
+    fetch(`${BASE}/first-timers/${id}/resolve`, { method: 'POST', headers: authHeaders() }).then(handle),
+  deleteFirstTimer: (id) =>
+    fetch(`${BASE}/first-timers/${id}`, { method: 'DELETE', headers: authHeaders() }).then(handle),
 };

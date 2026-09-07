@@ -48,6 +48,50 @@ router.post('/self-register', async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
+// POST /api/members/my-attendance — PUBLIC, no login required.
+// A member looks up their OWN attendance using their name + phone as a simple
+// shared secret (the same details they gave when they joined). Deliberately
+// does not accept a member ID directly — that would let anyone browse
+// anyone else's record just by guessing numbers.
+router.post('/my-attendance', async (req, res) => {
+  const { first_name, last_name, phone } = req.body;
+  if (!first_name || !last_name || !phone) {
+    return res.status(400).json({ error: 'first_name, last_name and phone are all required' });
+  }
+
+  const { rows: matches } = await pool.query(
+    `SELECT id, first_name, last_name FROM members
+     WHERE LOWER(first_name) = LOWER($1) AND LOWER(last_name) = LOWER($2) AND phone = $3
+     LIMIT 1`,
+    [first_name.trim(), last_name.trim(), phone.trim()]
+  );
+
+  if (!matches.length) {
+    return res.status(404).json({ error: "No matching record found — check your name and phone number match what's on file" });
+  }
+
+  const member = matches[0];
+  const { rows } = await pool.query(
+    `SELECT s.id AS service_id, s.service_date, s.service_type, s.name,
+            (a.id IS NOT NULL) AS present
+     FROM services s
+     LEFT JOIN attendance a ON a.service_id = s.id AND a.member_id = $1
+     ORDER BY s.service_date DESC`,
+    [member.id]
+  );
+  const total = rows.length;
+  const attended = rows.filter((r) => r.present).length;
+
+  res.json({
+    first_name: member.first_name,
+    last_name: member.last_name,
+    history: rows,
+    total_services: total,
+    attended,
+    attendance_rate: total ? +(attended / total * 100).toFixed(1) : null,
+  });
+});
+
 // POST /api/members — add a new member (usher/admin only)
 router.post('/', requireAuth, async (req, res) => {
   const { first_name, last_name, phone, email, department_id } = req.body;
@@ -89,8 +133,8 @@ router.delete('/:id', requireAuth, requireRole('admin'), async (req, res) => {
   res.status(204).send();
 });
 
-// GET /api/members/:id/attendance — a member's full attendance history + rate
-router.get('/:id/attendance', async (req, res) => {
+// GET /api/members/:id/attendance — a member's full attendance history + rate (staff only)
+router.get('/:id/attendance', requireAuth, async (req, res) => {
   const { id } = req.params;
   const { rows } = await pool.query(
     `SELECT s.id AS service_id, s.service_date, s.service_type, s.name,

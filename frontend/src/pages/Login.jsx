@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api';
 
+const TYPE_LABELS = { sunday: 'Sunday Service', midweek: 'Midweek / Bible Study', special: 'Special Program' };
+
 export default function Login({ onAuthed }) {
-  const [mode, setMode] = useState('login'); // 'login' | 'register' | 'join'
+  const [mode, setMode] = useState('login'); // 'login' | 'register' | 'join' | 'lookup'
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [joinForm, setJoinForm] = useState({ first_name: '', last_name: '', phone: '', email: '', department_id: '' });
+  const [lookupForm, setLookupForm] = useState({ first_name: '', last_name: '', phone: '' });
+  const [lookupResult, setLookupResult] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -53,6 +57,25 @@ export default function Login({ onAuthed }) {
     }
   }
 
+  async function submitLookup(e) {
+    e.preventDefault();
+    setError(null);
+    setLookupResult(null);
+    if (!lookupForm.first_name || !lookupForm.last_name || !lookupForm.phone) {
+      setError('Please fill in your first name, last name, and phone number');
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await api.lookupMyAttendance(lookupForm.first_name, lookupForm.last_name, lookupForm.phone);
+      setLookupResult(result);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -60,7 +83,69 @@ export default function Login({ onAuthed }) {
         <p className="app-subtitle">Church attendance, kept simply</p>
       </header>
       <div className="ledger" style={{ maxWidth: 460 }}>
-        {mode === 'join' ? (
+        {mode === 'lookup' ? (
+          <>
+            <h2 className="section-heading">Check my attendance</h2>
+            <p className="section-desc">
+              Enter your details exactly as given when you joined. No account or
+              password needed — just your name and phone number.
+            </p>
+
+            {error && <div className="error-banner">{error}</div>}
+
+            <form onSubmit={submitLookup} style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+              <input
+                placeholder="First name"
+                value={lookupForm.first_name}
+                onChange={(e) => setLookupForm({ ...lookupForm, first_name: e.target.value })}
+              />
+              <input
+                placeholder="Last name"
+                value={lookupForm.last_name}
+                onChange={(e) => setLookupForm({ ...lookupForm, last_name: e.target.value })}
+              />
+              <input
+                placeholder="Phone number"
+                value={lookupForm.phone}
+                onChange={(e) => setLookupForm({ ...lookupForm, phone: e.target.value })}
+              />
+              <button className="btn" type="submit" disabled={loading}>
+                {loading ? 'Looking up…' : 'Check my attendance'}
+              </button>
+            </form>
+
+            {lookupResult && (
+              <div style={{ marginTop: '1.25rem' }}>
+                <h3 className="chart-title">
+                  {lookupResult.first_name} {lookupResult.last_name}
+                </h3>
+                <p className="section-desc" style={{ marginTop: '-0.5rem' }}>
+                  Attended {lookupResult.attended} of {lookupResult.total_services} services
+                  {lookupResult.attendance_rate !== null ? ` (${lookupResult.attendance_rate}%)` : ''}
+                </p>
+                <div className="roll">
+                  {lookupResult.history.map((h) => (
+                    <div className="roll-row" key={h.service_id}>
+                      <div className="who">
+                        <span className="roll-name">{h.name || TYPE_LABELS[h.service_type] || h.service_type}</span>
+                        <span className="roll-dept">{new Date(h.service_date).toDateString()}</span>
+                      </div>
+                      <span className={`mark-btn ${h.present ? 'present' : ''}`} style={{ cursor: 'default' }}>
+                        {h.present ? '✓ Present' : 'Absent'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <p style={{ marginTop: '1rem', fontSize: '0.85rem' }}>
+              <button className="btn ghost" style={{ padding: '0.2rem 0.5rem' }} onClick={() => { setMode('login'); setLookupResult(null); }}>
+                Back to login
+              </button>
+            </p>
+          </>
+        ) : mode === 'join' ? (
           joinSuccess ? (
             <>
               <h2 className="section-heading">You're on the list</h2>
@@ -168,6 +253,7 @@ export default function Login({ onAuthed }) {
                 <span>Already have an account? <button className="btn ghost" style={{ padding: '0.2rem 0.5rem' }} onClick={() => setMode('login')}>Log in</button></span>
               )}
               <span>Church member wanting to be added to the roll? <button className="btn ghost" style={{ padding: '0.2rem 0.5rem' }} onClick={() => setMode('join')}>Join here</button></span>
+              <span>Want to check your own attendance? <button className="btn ghost" style={{ padding: '0.2rem 0.5rem' }} onClick={() => setMode('lookup')}>Check my attendance</button></span>
             </p>
           </>
         )}
