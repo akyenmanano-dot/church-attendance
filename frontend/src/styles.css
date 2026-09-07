@@ -1,15 +1,15 @@
 :root {
-  --ink: #211D17;
-  --ink-soft: #4A4438;
-  --paper: #EFE7D8;
-  --paper-dim: #E2D6BC;
-  --paper-line: #C9BB9C;
-  --brass: #9C6B2E;
-  --brass-dark: #7A5323;
-  --burgundy: #7A2E2E;
-  --sage: #57684A;
-  --sage-dim: #E3E8D9;
-  --burgundy-dim: #F1DFDD;
+  --ink: #16232B;
+  --ink-soft: #4A6572;
+  --paper: #EAF2EF;
+  --paper-dim: #D7E8E2;
+  --paper-line: #B7D0C6;
+  --brass: #2F7A6D;
+  --brass-dark: #235B52;
+  --burgundy: #B23A48;
+  --sage: #3E7A57;
+  --sage-dim: #DCEEE2;
+  --burgundy-dim: #F4DEE0;
 
   --font-display: 'Fraunces', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;

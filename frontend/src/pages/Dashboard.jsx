@@ -71,11 +71,11 @@ export default function Dashboard() {
         <h3 className="chart-title">Attendance trend</h3>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={chartData}>
-            <CartesianGrid stroke="#E2D6BC" vertical={false} />
-            <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#4A4438' }} axisLine={{ stroke: '#C9BB9C' }} tickLine={false} />
-            <YAxis tick={{ fontSize: 12, fill: '#4A4438' }} axisLine={false} tickLine={false} />
+            <CartesianGrid stroke="#D7E8E2" vertical={false} />
+            <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#4A6572' }} axisLine={{ stroke: '#B7D0C6' }} tickLine={false} />
+            <YAxis tick={{ fontSize: 12, fill: '#4A6572' }} axisLine={false} tickLine={false} />
             <Tooltip />
-            <Line type="monotone" dataKey="present" stroke="#9C6B2E" strokeWidth={2.5} dot={{ r: 3, fill: '#9C6B2E' }} />
+            <Line type="monotone" dataKey="present" stroke="#2F7A6D" strokeWidth={2.5} dot={{ r: 3, fill: '#2F7A6D' }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
