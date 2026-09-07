@@ -1,12 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api';
 
+const TYPE_LABELS = {
+  sunday: 'Sunday Service',
+  midweek: 'Midweek / Bible Study',
+  special: 'Special Program',
+};
+
+const DEFAULT_NAMES = {
+  sunday: 'Sunday Service',
+  midweek: 'Bible Study',
+  special: 'Special Program',
+};
+
 export default function RollCall() {
   const [services, setServices] = useState([]);
   const [serviceId, setServiceId] = useState(null);
   const [roll, setRoll] = useState([]);
   const [error, setError] = useState(null);
   const [newDate, setNewDate] = useState('');
+  const [newType, setNewType] = useState('sunday');
+  const [newName, setNewName] = useState('');
 
   useEffect(() => {
     api.getServices().then((rows) => {
@@ -26,7 +40,7 @@ export default function RollCall() {
       if (member.present) {
         await api.unmark(member.member_id, serviceId);
       } else {
-        await api.markPresent(member.member_id, serviceId, 'usher');
+        await api.markPresent(member.member_id, serviceId);
       }
       const fresh = await api.getRollCall(serviceId);
       setRoll(fresh);
@@ -35,13 +49,18 @@ export default function RollCall() {
     }
   }
 
-  async function createTodayService() {
+  async function createService() {
     if (!newDate) return;
     try {
-      const created = await api.addService({ service_date: newDate, service_type: 'sunday', name: 'Sunday Service' });
+      const created = await api.addService({
+        service_date: newDate,
+        service_type: newType,
+        name: newName.trim() || DEFAULT_NAMES[newType],
+      });
       setServices((s) => [created, ...s]);
       setServiceId(created.id);
       setNewDate('');
+      setNewName('');
     } catch (e) {
       setError(e.message);
     }
@@ -60,12 +79,26 @@ export default function RollCall() {
         <select value={serviceId || ''} onChange={(e) => setServiceId(Number(e.target.value))}>
           {services.map((s) => (
             <option key={s.id} value={s.id}>
-              {s.name} — {new Date(s.service_date).toDateString()}
+              {s.name} — {new Date(s.service_date).toDateString()} ({TYPE_LABELS[s.service_type] || s.service_type})
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="service-picker" style={{ marginTop: '-0.5rem' }}>
+        <select value={newType} onChange={(e) => setNewType(e.target.value)}>
+          <option value="sunday">Sunday Service</option>
+          <option value="midweek">Midweek / Bible Study</option>
+          <option value="special">Special Program</option>
+        </select>
         <input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} />
-        <button className="btn ghost" onClick={createTodayService}>+ New service</button>
+        <input
+          placeholder={`Name (defaults to "${DEFAULT_NAMES[newType]}")`}
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          style={{ minWidth: '220px' }}
+        />
+        <button className="btn ghost" onClick={createService}>+ New service</button>
       </div>
 
       {roll.length === 0 ? (
