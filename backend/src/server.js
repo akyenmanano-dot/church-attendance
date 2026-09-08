@@ -9,6 +9,7 @@ const dashboardRouter = require('./routes/dashboard');
 const flagsJobRouter = require('./routes/flagsJob');
 const departmentsRouter = require('./routes/departments');
 const authRouter = require('./routes/auth');
+const firstTimersRouter = require('./routes/firstTimers');
 
 const app = express();
 app.use(cors());
@@ -23,6 +24,7 @@ app.use('/api/attendance', attendanceRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/run-flag-check', flagsJobRouter);
 app.use('/api/departments', departmentsRouter);
+app.use('/api/first-timers', firstTimersRouter);
 
 // Basic error handler so unhandled async errors return JSON, not a stack trace
 app.use((err, req, res, next) => {

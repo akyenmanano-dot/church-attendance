@@ -51,6 +51,20 @@ CREATE TABLE IF NOT EXISTS users (
   role          VARCHAR(20) NOT NULL DEFAULT 'usher' -- admin | dept_head | usher
 );
 
+CREATE TABLE IF NOT EXISTS first_timers (
+  id            SERIAL PRIMARY KEY,
+  first_name    VARCHAR(100) NOT NULL,
+  last_name     VARCHAR(100),
+  phone         VARCHAR(30),
+  invited_by    VARCHAR(150),          -- who invited them, if known
+  notes         TEXT,
+  service_id    INTEGER REFERENCES services(id) ON DELETE SET NULL,
+  logged_by     VARCHAR(100),          -- usher/admin who logged them
+  followed_up   BOOLEAN NOT NULL DEFAULT FALSE,
+  followed_up_at TIMESTAMP,
+  created_at    TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 -- Helpful indexes
 CREATE INDEX IF NOT EXISTS idx_attendance_service ON attendance(service_id);
 CREATE INDEX IF NOT EXISTS idx_attendance_member ON attendance(member_id);
