@@ -5,9 +5,13 @@ const jwt = require('jsonwebtoken');
 const pool = require('../db/pool');
 const { JWT_SECRET, requireAuth, requireRole } = require('../middleware/auth');
 
+const MAX_USHERS = parseInt(process.env.MAX_USHERS || '5', 10);
+
 // POST /api/auth/register — create an account.
 // The very first person to register becomes 'admin' automatically (bootstrap).
-// Everyone after that registers as 'usher' by default.
+// Everyone after that registers as 'usher', up to a cap of MAX_USHERS —
+// once full, registration is closed and an admin has to make room
+// (promote someone to admin, or remove an account) before anyone else can join.
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) {
@@ -18,7 +22,20 @@ router.post('/register', async (req, res) => {
   }
 
   const { rows: existingCount } = await pool.query('SELECT COUNT(*)::int AS count FROM users');
-  const role = existingCount[0].count === 0 ? 'admin' : 'usher';
+  const isFirstAccount = existingCount[0].count === 0;
+
+  if (!isFirstAccount) {
+    const { rows: usherCount } = await pool.query(
+      `SELECT COUNT(*)::int AS count FROM users WHERE role = 'usher'`
+    );
+    if (usherCount[0].count >= MAX_USHERS) {
+      return res.status(403).json({
+        error: `Usher accounts are full (${MAX_USHERS} max). Ask an admin to make room before registering.`,
+      });
+    }
+  }
+
+  const role = isFirstAccount ? 'admin' : 'usher';
 
   const password_hash = await bcrypt.hash(password, 10);
 
@@ -100,6 +117,12 @@ router.post('/users/:id/role', requireAuth, requireRole('admin'), async (req, re
     );
     if (adminCount[0].count === 0) {
       return res.status(400).json({ error: 'Cannot remove the last admin — promote someone else first' });
+    }
+    const { rows: usherCount } = await pool.query(
+      `SELECT COUNT(*)::int AS count FROM users WHERE role = 'usher'`
+    );
+    if (usherCount[0].count >= MAX_USHERS) {
+      return res.status(400).json({ error: `Usher accounts are already full (${MAX_USHERS} max)` });
     }
   }
 

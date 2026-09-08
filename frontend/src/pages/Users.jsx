@@ -62,6 +62,7 @@ export default function Users() {
         Since this system doesn't send reset emails, an admin can reset anyone's
         password directly here. Having more than one admin also means the church
         isn't stuck if a single admin forgets their password or is unavailable.
+        Usher accounts: {users.filter((u) => u.role === 'usher').length} / 5 used.
       </p>
 
       {error && <div className="error-banner">{error}</div>}
