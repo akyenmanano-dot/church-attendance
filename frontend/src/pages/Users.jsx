@@ -36,12 +36,32 @@ export default function Users() {
     }
   }
 
+  async function toggleRole(u) {
+    setError(null);
+    setSuccess(null);
+    const newRole = u.role === 'admin' ? 'usher' : 'admin';
+    const sure = window.confirm(
+      newRole === 'admin'
+        ? `Make ${u.name} an admin? They'll be able to delete members and manage other accounts.`
+        : `Remove admin from ${u.name}? They'll become a regular usher.`
+    );
+    if (!sure) return;
+    try {
+      await api.changeUserRole(u.id, newRole);
+      setSuccess(`${u.name} is now ${newRole === 'admin' ? 'an admin' : 'a usher'}.`);
+      load();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   return (
     <div className="ledger">
       <h2 className="section-heading">Usher &amp; admin accounts</h2>
       <p className="section-desc">
         Since this system doesn't send reset emails, an admin can reset anyone's
-        password directly here if they get locked out.
+        password directly here. Having more than one admin also means the church
+        isn't stuck if a single admin forgets their password or is unavailable.
       </p>
 
       {error && <div className="error-banner">{error}</div>}
@@ -77,7 +97,12 @@ export default function Users() {
                   <span>{u.name}</span>{' '}
                   <span className="m-dept">{u.email} · {u.role}</span>
                 </div>
-                <button className="btn ghost" onClick={() => startReset(u.id)}>Reset password</button>
+                <div style={{ display: 'flex', gap: '0.4rem' }}>
+                  <button className="btn ghost" onClick={() => startReset(u.id)}>Reset password</button>
+                  <button className="btn subtle" onClick={() => toggleRole(u)}>
+                    {u.role === 'admin' ? 'Remove admin' : 'Make admin'}
+                  </button>
+                </div>
               </>
             )}
           </div>

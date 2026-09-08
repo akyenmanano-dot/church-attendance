@@ -84,4 +84,31 @@ router.post('/users/:id/reset-password', requireAuth, requireRole('admin'), asyn
   res.json({ success: true, user: rows[0] });
 });
 
+// POST /api/auth/users/:id/role — admin only, promote a usher to admin or demote an admin to usher.
+// Refuses to demote the last remaining admin, so the church never gets locked out entirely.
+router.post('/users/:id/role', requireAuth, requireRole('admin'), async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+  if (!['admin', 'usher'].includes(role)) {
+    return res.status(400).json({ error: "role must be 'admin' or 'usher'" });
+  }
+
+  if (role === 'usher') {
+    const { rows: adminCount } = await pool.query(
+      `SELECT COUNT(*)::int AS count FROM users WHERE role = 'admin' AND id != $1`,
+      [id]
+    );
+    if (adminCount[0].count === 0) {
+      return res.status(400).json({ error: 'Cannot remove the last admin — promote someone else first' });
+    }
+  }
+
+  const { rows } = await pool.query(
+    `UPDATE users SET role = $1 WHERE id = $2 RETURNING id, name, email, role`,
+    [role, id]
+  );
+  if (!rows.length) return res.status(404).json({ error: 'User not found' });
+  res.json({ success: true, user: rows[0] });
+});
+
 module.exports = router;

@@ -42,6 +42,12 @@ export const api = {
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ newPassword }),
     }).then(handle),
+  changeUserRole: (userId, role) =>
+    fetch(`${BASE}/auth/users/${userId}/role`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ role }),
+    }).then(handle),
 
   // members
   getMembers: (params = {}) =>
