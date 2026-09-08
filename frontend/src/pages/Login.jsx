@@ -217,6 +217,7 @@ export default function Login({ onAuthed }) {
               {mode === 'login'
                 ? 'Enter your usher/admin account to mark attendance.'
                 : 'The first person to register becomes the admin automatically.'}
+              {mode === 'login' && ' Forgot your password? Ask an admin to reset it for you.'}
             </p>
 
             {error && <div className="error-banner">{error}</div>}

@@ -35,6 +35,13 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     }).then(handle),
+  getUsers: () => fetch(`${BASE}/auth/users`, { headers: authHeaders() }).then(handle),
+  adminResetPassword: (userId, newPassword) =>
+    fetch(`${BASE}/auth/users/${userId}/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ newPassword }),
+    }).then(handle),
 
   // members
   getMembers: (params = {}) =>
