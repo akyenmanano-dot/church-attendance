@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import RollCall from './pages/RollCall';
 import Dashboard from './pages/Dashboard';
 import Members from './pages/Members';
+import FirstTimers from './pages/FirstTimers';
+import Users from './pages/Users';
 import Login from './pages/Login';
 
-const TABS = [
+const BASE_TABS = [
   { id: 'roll', label: 'Mark attendance' },
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'members', label: 'Members' },
+  { id: 'first-timers', label: 'First-timers' },
 ];
 
 function getStoredUser() {
@@ -31,6 +34,10 @@ export default function App() {
   if (!user) {
     return <Login onAuthed={setUser} />;
   }
+
+  const TABS = user.role === 'admin'
+    ? [...BASE_TABS, { id: 'users', label: 'Users' }]
+    : BASE_TABS;
 
   return (
     <div className="app">
@@ -63,6 +70,8 @@ export default function App() {
       {tab === 'roll' && <RollCall />}
       {tab === 'dashboard' && <Dashboard />}
       {tab === 'members' && <Members />}
+      {tab === 'first-timers' && <FirstTimers />}
+      {tab === 'users' && user.role === 'admin' && <Users />}
     </div>
   );
 }
