@@ -52,10 +52,14 @@ async function flagAbsentees() {
       );
       if (existing.length) continue;
 
+      const reason = STREAK_THRESHOLD === 1
+        ? 'Missed last Sunday service'
+        : `Missed last ${STREAK_THRESHOLD} Sunday services in a row`;
+
       await client.query(
         `INSERT INTO flags (member_id, reason, streak_count)
          VALUES ($1, $2, $3)`,
-        [member.id, `Missed last ${STREAK_THRESHOLD} Sunday services in a row`, STREAK_THRESHOLD]
+        [member.id, reason, STREAK_THRESHOLD]
       );
       flaggedMembers.push(`${member.first_name} ${member.last_name}`);
     }
